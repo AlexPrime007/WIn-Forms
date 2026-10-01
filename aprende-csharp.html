@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aprende C# paso a paso</title>
+<style>
+:root{
+  --bg:#f2f4f9; --panel:#fff; --ink:#161a2e; --muted:#5d6580; --line:#dde1ee;
+  --brand:#6a3fd1; --brand-soft:#ece6fb; --ok:#14966f; --ok-soft:#dff5ec; --bad:#c43c3c; --gold:#f2a93b;
+  --code-bg:#1b1d33; --code-ink:#e8e9ff;
+  --sans:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif; --mono:Consolas,"Cascadia Code",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#10121f;--panel:#191c30;--ink:#eceefb;--muted:#9aa2c4;--line:#2b2f4a;--brand:#9a7bf0;--brand-soft:#2a2350;--ok-soft:#12372e;--code-bg:#0b0c18}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.6}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+
+.top{position:sticky;top:0;z-index:20;display:flex;gap:.75rem;align-items:center;padding:.6rem 1rem;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:.5rem;font-weight:700;color:var(--ink);text-decoration:none;white-space:nowrap}
+.logo{display:grid;place-items:center;width:2rem;height:2rem;border-radius:.4rem;background:var(--brand);color:#fff;font-size:.95rem}
+#buscar{flex:1;min-width:0;max-width:26rem;margin-left:auto;padding:.5rem .8rem;border:1px solid var(--line);border-radius:.5rem;background:var(--bg)}
+.icon{display:none;border:0;background:none;font-size:1.4rem;cursor:pointer}
+
+.layout{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 56px)}
+.side{border-right:1px solid var(--line);background:var(--panel);padding:1rem;position:sticky;top:56px;height:calc(100vh - 56px);overflow:auto}
+#nav a{display:flex;justify-content:space-between;gap:.5rem;padding:.55rem .75rem;border-radius:.5rem;color:var(--ink);text-decoration:none}
+#nav a:hover{background:var(--bg)}
+#nav a.on{background:var(--brand-soft);color:var(--brand);font-weight:600}
+#nav .sep{margin:1rem .75rem .25rem;font-size:.85rem;color:var(--muted)}
+.tick{color:var(--ok);font-weight:700}
+
+main{padding:2rem clamp(1rem,4vw,3rem);max-width:56rem;width:100%}
+h1{font-size:clamp(1.7rem,4vw,2.4rem);line-height:1.15;margin:.2rem 0 .6rem}
+h2{font-size:1.3rem;margin:2rem 0 .6rem}
+h3{margin:1.4rem 0 .3rem}
+.muted{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:.8rem;padding:1.2rem;margin:1rem 0}
+pre{margin:.6rem 0;padding:1rem;border-radius:.6rem;background:var(--code-bg);color:var(--code-ink);font:.9rem/1.5 var(--mono);overflow-x:auto}
+textarea{width:100%;min-height:9rem;padding:1rem;border-radius:.6rem;border:1px solid var(--line);background:var(--code-bg);color:var(--code-ink);font:.9rem/1.5 var(--mono);resize:vertical;tab-size:4}
+
+button{cursor:pointer}
+.primary,.ghost{padding:.55rem 1rem;border-radius:.5rem;border:1px solid var(--brand);font-weight:600}
+.primary{background:var(--brand);color:#fff}
+.ghost{background:none;color:var(--brand)}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.8rem}
+.fb{margin-top:.8rem;padding:.7rem 1rem;border-radius:.5rem;font-weight:600}
+.fb.good{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:#fbe5e5;color:var(--bad)}
+
+.opt{display:block;width:100%;text-align:left;margin:.35rem 0;padding:.6rem .9rem;border:1px solid var(--line);border-radius:.5rem;background:var(--panel)}
+.opt:hover{border-color:var(--brand)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{border-color:var(--bad)}
+
+.flash{min-height:11rem;display:grid;place-items:center;text-align:center;font-size:1.3rem;padding:1.5rem;border:2px dashed var(--brand);border-radius:.8rem;background:var(--panel);width:100%;cursor:pointer}
+.bar{height:.6rem;border-radius:1rem;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.8rem}
+.badge{padding:1rem;text-align:center;border:1px solid var(--line);border-radius:.8rem;background:var(--panel);opacity:.45}
+.badge.got{opacity:1;border-color:var(--gold)}
+.badge b{display:block;font-size:1.8rem}
+ul.hist{padding-left:1.1rem}
+a{color:var(--brand)}
+
+dialog{border:1px solid var(--line);border-radius:.8rem;background:var(--panel);color:var(--ink);max-width:22rem;width:92%}
+dialog::backdrop{background:rgba(10,10,30,.55)}
+dialog label{display:block;margin:.7rem 0}
+dialog input{width:100%;padding:.5rem;border:1px solid var(--line);border-radius:.4rem;background:var(--bg)}
+
+@media (max-width:820px){
+  .icon{display:block}
+  .layout{grid-template-columns:1fr}
+  .side{position:fixed;inset:56px auto 0 0;width:80%;max-width:300px;height:auto;transform:translateX(-100%);transition:transform .2s;z-index:15}
+  .side.open{transform:none;box-shadow:0 0 0 100vmax rgba(0,0,0,.4)}
+  .brand span:last-child{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media print{.top,.side,.row,.opt{display:none}.layout{display:block}}
+</style>
+</head>
+<body>
+<header class="top">
+  <button id="menuBtn" class="icon" aria-label="Abrir menú">☰</button>
+  <a class="brand" href="#/inicio"><span class="logo">C#</span> Aprende C# paso a paso</a>
+  <input id="buscar" type="search" placeholder="Buscar tema (ej. LINQ, async)" aria-label="Buscar tema">
+  <button id="userBtn" class="ghost">Entrar</button>
+</header>
+
+<div class="layout">
+  <aside id="side" class="side">
+    <nav id="nav" aria-label="Módulos"></nav>
+  </aside>
+  <main id="main" tabindex="-1"></main>
+</div>
+
+<dialog id="login">
+  <form method="dialog" id="loginForm">
+    <h2>Crea tu cuenta</h2>
+    <p class="muted">Se guarda solo en este navegador. Sirve para ver tu progreso.</p>
+    <label>Nombre <input id="nombre" required maxlength="30"></label>
+    <label>Contraseña <input id="clave" type="password" required minlength="4"></label>
+    <div class="row"><button value="ok" class="primary">Guardar cuenta</button><button value="cancel" class="ghost" formnovalidate>Cancelar</button></div>
+  </form>
+</dialog>
+
+<script>
+/* Contenido */
+const M=[
+{id:'variables',t:'Variables y tipos de datos',k:'int string double decimal bool var',
+ intro:'Una variable es una caja con nombre donde guardas un dato. En C# cada caja tiene un tipo que dice qué puede guardar.',
+ steps:[['Declarar variables','Escribe el tipo, el nombre y el valor. Ejemplo con datos de un cliente:','string nombre = "Ana";\nint edad = 25;\ndecimal saldo = 1200.50m;\nbool activo = true;'],
+ ['Inferir con var','Si el valor deja claro el tipo, el compilador lo deduce.','var total = 150.75m; // decimal\nvar mensaje = "Hola";  // string']],
+ ex:{p:'Declara una variable decimal llamada saldo con valor 250.50m.',s:'// Tu código aquí\n',re:/decimal\s+saldo\s*=\s*250\.50?m\s*;/,h:'Forma: decimal nombre = 10.5m;'},
+ quiz:[['¿Qué tipo se recomienda para dinero?',['decimal','bool','char'],0],['¿Qué tipo guarda texto?',['int','string','double'],1]],
+ cards:[['int','Número entero, por ejemplo 42.'],['string','Texto entre comillas dobles.'],['decimal','Número con decimales, ideal para dinero.']]},
+{id:'control',t:'Estructuras de control',k:'if else for while switch',
+ intro:'Las estructuras de control deciden qué código se ejecuta y cuántas veces.',
+ steps:[['Decidir con if','Ejecuta un bloque solo si la condición es verdadera.','if (edad >= 18)\n{\n    Console.WriteLine("Mayor de edad");\n}\nelse\n{\n    Console.WriteLine("Menor de edad");\n}'],
+ ['Repetir con for','Útil para recorrer una lista de clientes o sumar valores.','for (int i = 1; i <= 5; i++)\n{\n    Console.WriteLine($"Cliente {i}");\n}']],
+ ex:{p:'Escribe un if que compruebe si edad es mayor o igual a 18.',s:'int edad = 20;\n// Tu código aquí\n',re:/if\s*\(\s*edad\s*>=\s*18\s*\)/,h:'La condición va entre paréntesis: if (edad >= 18)'},
+ quiz:[['¿Qué bucle usarías para repetir 5 veces?',['for','if','try'],0],['¿Qué hace else?',['Repite código','Se ejecuta si el if es falso','Declara una variable'],1]],
+ cards:[['if / else','Elige entre dos caminos según una condición.'],['for','Repite un bloque un número conocido de veces.'],['while','Repite mientras la condición sea verdadera.']]},
+{id:'poo',t:'Programación orientada a objetos',k:'clase objeto propiedad herencia metodo',
+ intro:'Una clase es un molde; un objeto es una pieza hecha con ese molde. Así modelas cosas reales: clientes, productos, pedidos.',
+ steps:[['Crear una clase','Las propiedades guardan datos; los métodos hacen acciones.','public class Cliente\n{\n    public string Nombre { get; set; }\n    public decimal Saldo { get; set; }\n\n    public void Depositar(decimal monto)\n    {\n        Saldo += monto;\n    }\n}'],
+ ['Crear un objeto','Usa new para fabricar un objeto de la clase.','var c = new Cliente { Nombre = "Luis" };\nc.Depositar(100m);']],
+ ex:{p:'Crea una clase Cliente con una propiedad string Nombre { get; set; }.',s:'// Tu código aquí\n',re:/class\s+Cliente[\s\S]*string\s+Nombre\s*\{\s*get;\s*set;\s*\}/,h:'public string Nombre { get; set; }'},
+ quiz:[['¿Qué palabra crea un objeto?',['new','class','void'],0],['Una clase es...',['Un dato suelto','Un molde para objetos','Un error'],1]],
+ cards:[['Clase','Plantilla que define datos y comportamiento.'],['Propiedad','Dato de un objeto con get y set.'],['Herencia','Una clase reutiliza lo de otra con :.']]},
+{id:'linq',t:'LINQ',k:'where select consulta lista filtrar',
+ intro:'LINQ te permite consultar listas con pocas líneas, como si hicieras preguntas a tus datos.',
+ steps:[['Filtrar con Where','Quédate solo con lo que cumple una condición.','var numeros = new List<int> { 4, 12, 7, 20 };\nvar grandes = numeros.Where(n => n > 10);'],
+ ['Transformar con Select','Crea una nueva lista a partir de otra.','var nombres = clientes.Select(c => c.Nombre);']],
+ ex:{p:'Filtra la lista numeros para obtener los mayores que 10 con Where.',s:'var numeros = new List<int> { 4, 12, 7, 20 };\n// Tu código aquí\n',re:/numeros\s*\.Where\(\s*\w+\s*=>\s*\w+\s*>\s*10\s*\)/,h:'numeros.Where(n => n > 10)'},
+ quiz:[['¿Qué método filtra elementos?',['Where','Select','Add'],0],['¿Qué significa =>?',['Comparar','Expresión lambda','Comentario'],1]],
+ cards:[['Where','Filtra una colección por condición.'],['Select','Transforma cada elemento.'],['Lambda','Función corta: x => x * 2.']]},
+{id:'excepciones',t:'Manejo de excepciones',k:'try catch finally error',
+ intro:'Las excepciones son errores en tiempo de ejecución. Con try/catch tu programa responde en vez de cerrarse.',
+ steps:[['try y catch','Pon el código riesgoso en try y la respuesta al error en catch.','try\n{\n    int n = int.Parse(texto);\n}\ncatch (FormatException)\n{\n    Console.WriteLine("Escribe un número válido");\n}\nfinally\n{\n    Console.WriteLine("Fin");\n}']],
+ ex:{p:'Escribe un bloque try con un catch (FormatException).',s:'// Tu código aquí\n',re:/try\s*\{[\s\S]*\}\s*catch\s*\(\s*FormatException/,h:'try { ... } catch (FormatException) { ... }'},
+ quiz:[['¿Qué bloque se ejecuta siempre?',['finally','catch','else'],0],['int.Parse("abc") lanza...',['FormatException','NullReference','Nada'],0]],
+ cards:[['try','Bloque donde puede ocurrir un error.'],['catch','Bloque que atrapa el error.'],['finally','Se ejecuta haya o no error.']]},
+{id:'async',t:'Asincronía (async/await)',k:'async await task',
+ intro:'Con async/await el programa espera tareas lentas (red, archivos) sin congelar la pantalla.',
+ steps:[['Método asíncrono','Marca el método con async y devuelve Task. Usa await para esperar.','public async Task<string> CargarAsync()\n{\n    await Task.Delay(1000);\n    return "Datos listos";\n}']],
+ ex:{p:'Declara un método public async Task llamado CargarAsync.',s:'// Tu código aquí\n',re:/async\s+Task(<\w+>)?\s+CargarAsync\s*\(/,h:'public async Task CargarAsync() { }'},
+ quiz:[['¿Qué palabra espera una tarea?',['await','wait','stop'],0],['Un método async suele devolver...',['Task','int','char'],0]],
+ cards:[['async','Marca un método que puede esperar sin bloquear.'],['await','Espera el resultado de una Task.'],['Task','Representa un trabajo en curso.']]}
+];
+const BADGES=[['🌱','Primer paso','Completa tu primer ejercicio'],['🎯','Pleno','Saca 100% en un cuestionario'],['🔥','Mitad del camino','Completa 3 módulos'],['🏆','Maestro de C#','Completa todos los módulos']];
+
+/* Estado */
+let S={user:null,done:{},hist:[],badges:[]};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem('csharp-edu')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('csharp-edu',JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s);
+const el=(t,a={},...c)=>{const n=document.createElement(t);for(const k in a){k==='class'?n.className=a[k]:k.startsWith('on')?n.addEventListener(k.slice(2),a[k]):n.setAttribute(k,a[k])}c.flat().forEach(x=>n.append(x));return n};
+const isDone=m=>{const d=S.done[m.id]||{};return d.ex&&d.quiz};
+const pct=()=>Math.round(M.filter(isDone).length/M.length*100);
+
+function award(){
+  const n=M.filter(isDone).length, have=new Set(S.badges);
+  if(S.hist.length)have.add('Primer paso');
+  if(Object.values(S.done).some(d=>d.perfect))have.add('Pleno');
+  if(n>=3)have.add('Mitad del camino');
+  if(n===M.length)have.add('Maestro de C#');
+  S.badges=[...have];save();
+}
+function mark(id,key,txt){
+  S.done[id]=Object.assign(S.done[id]||{},{[key]:true});
+  if(txt)S.hist.unshift(txt+' · '+new Date().toLocaleDateString('es'));
+  award();drawNav();
+}
+
+/* Navegación */
+function drawNav(filter=''){
+  const f=filter.toLowerCase(), nav=$('#nav');nav.innerHTML='';
+  nav.append(el('div',{class:'sep'},'Módulos'));
+  M.filter(m=>(m.t+' '+m.k).toLowerCase().includes(f)).forEach(m=>
+    nav.append(el('a',{href:'#/m/'+m.id,class:location.hash==='#/m/'+m.id?'on':''},m.t,isDone(m)?el('span',{class:'tick'},'✓'):'')));
+  nav.append(el('div',{class:'sep'},'Repaso y cuenta'));
+  [['#/cards','Flashcards'],['#/panel','Mi progreso'],['#/recursos','Recursos']].forEach(([h,t])=>nav.append(el('a',{href:h,class:location.hash===h?'on':''},t)));
+  $('#userBtn').textContent=S.user?S.user:'Entrar';
+}
+
+/* Vistas */
+function home(){
+  return [el('h1',{},'Aprende C# paso a paso'),
+    el('p',{class:'muted'},'Teoría corta, ejemplos reales y ejercicios con respuesta inmediata. Empieza por el primer módulo o busca un tema.'),
+    el('div',{class:'bar'},el('i',{style:'width:'+pct()+'%'})),el('p',{class:'muted'},pct()+'% completado'),
+    el('div',{class:'row'},el('a',{href:'#/m/'+M[0].id,class:'primary',style:'text-decoration:none'},'Empezar')),
+    el('div',{class:'card'},el('b',{},'Sobre el código'),el('p',{class:'muted'},'Este sitio comprueba tu código con patrones, pero no compila C#. Para ejecutar de verdad, pega los ejemplos en Visual Studio o en dotnetfiddle.net.'))];
+}
+function lesson(m){
+  const out=[el('h1',{},m.t),el('p',{},m.intro)];
+  m.steps.forEach(s=>out.push(el('h3',{},s[0]),el('p',{},s[1]),el('pre',{},el('code',{},s[2]))));
+  // ejercicio
+  const ta=el('textarea',{spellcheck:'false','aria-label':'Editor de código'});ta.value=m.ex.s;
+  const fb=el('div',{});
+  ta.addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();ta.setRangeText('    ',ta.selectionStart,ta.selectionEnd,'end')}});
+  out.push(el('h2',{},'Ejercicio guiado'),el('div',{class:'card'},el('p',{},m.ex.p),ta,
+    el('div',{class:'row'},el('button',{class:'primary',onclick:()=>{
+      if(m.ex.re.test(ta.value)){fb.className='fb good';fb.textContent='¡Correcto! Lo hiciste bien.';if(!(S.done[m.id]||{}).ex)mark(m.id,'ex','Ejercicio: '+m.t);}
+      else{fb.className='fb bad';fb.textContent='Aún no. Pista: '+m.ex.h;}
+    }},'Comprobar'),el('button',{class:'ghost',onclick:()=>{ta.value=m.ex.s;fb.className='';fb.textContent=''}},'Reiniciar')),fb));
+  // quiz
+  let ok=0,ans=0;const res=el('div',{});
+  const qs=m.quiz.map(([q,o,c])=>{
+    const box=el('div',{class:'card'},el('b',{},q));let used=false;
+    o.forEach((t,i)=>{const b=el('button',{class:'opt'},t);b.onclick=()=>{
+      if(used)return;used=true;ans++;
+      if(i===c){ok++;b.classList.add('right')}else{b.classList.add('wrong');box.querySelectorAll('.opt')[c].classList.add('right')}
+      if(ans===m.quiz.length){
+        res.className='fb '+(ok===ans?'good':'bad');res.textContent='Resultado: '+ok+' de '+ans;
+        if(ok===ans){S.done[m.id]=Object.assign(S.done[m.id]||{},{perfect:true});mark(m.id,'quiz','Cuestionario: '+m.t)}
+      }};box.append(b)});
+    return box;});
+  out.push(el('h2',{},'Mini cuestionario'),qs,res);
+  out.push(el('div',{class:'row'},el('button',{class:'ghost',onclick:()=>{location.hash='#/cards'}},'Repasar con flashcards')));
+  return out;
+}
+function cards(){
+  const all=M.flatMap(m=>m.cards.map(c=>({m:m.t,c})));let i=0,back=false;
+  const box=el('button',{class:'flash'}),meta=el('p',{class:'muted'});
+  const draw=()=>{box.textContent=back?all[i].c[1]:all[i].c[0];meta.textContent=all[i].m+' · '+(i+1)+'/'+all.length+(back?'':' · toca para ver la respuesta')};
+  box.onclick=()=>{back=!back;draw()};draw();
+  return [el('h1',{},'Flashcards'),box,meta,el('div',{class:'row'},
+    el('button',{class:'ghost',onclick:()=>{i=(i-1+all.length)%all.length;back=false;draw()}},'Anterior'),
+    el('button',{class:'primary',onclick:()=>{i=(i+1)%all.length;back=false;draw()}},'Siguiente'))];
+}
+function panel(){
+  return [el('h1',{},S.user?'Hola, '+S.user:'Mi progreso'),
+    S.user?'':el('p',{class:'muted'},'Pulsa "Entrar" arriba para crear tu cuenta local.'),
+    el('div',{class:'bar'},el('i',{style:'width:'+pct()+'%'})),el('p',{class:'muted'},pct()+'% del curso'),
+    el('h2',{},'Por módulo'),M.map(m=>{const d=S.done[m.id]||{};return el('p',{},(isDone(m)?'✓ ':'○ ')+m.t+' — ejercicio '+(d.ex?'listo':'pendiente')+', cuestionario '+(d.quiz?'listo':'pendiente'))}),
+    el('h2',{},'Logros'),el('div',{class:'grid'},BADGES.map(([e,n,d])=>el('div',{class:'badge'+(S.badges.includes(n)?' got':'')},el('b',{},e),n,el('div',{class:'muted'},d)))),
+    el('h2',{},'Historial'),S.hist.length?el('ul',{class:'hist'},S.hist.slice(0,15).map(h=>el('li',{},h))):el('p',{class:'muted'},'Aún no completaste ejercicios.')];
+}
+function recursos(){
+  return [el('h1',{},'Recursos'),
+    el('div',{class:'card'},el('b',{},'Guía en PDF'),el('p',{class:'muted'},'Abre la ventana de impresión y elige "Guardar como PDF".'),el('button',{class:'primary',onclick:()=>window.print()},'Descargar guía')),
+    el('div',{class:'card'},el('b',{},'Documentación oficial'),el('p',{},el('a',{href:'https://learn.microsoft.com/es-es/dotnet/csharp/',target:'_blank',rel:'noopener'},'Documentación de C# en Microsoft Learn')),el('p',{},el('a',{href:'https://learn.microsoft.com/es-es/dotnet/csharp/tour-of-csharp/',target:'_blank',rel:'noopener'},'Tour de C#'))),
+    el('div',{class:'card'},el('b',{},'Videos'),el('p',{class:'muted'},'Para integrar un video, agrega en index.html un <iframe> con la URL de inserción (embed) del video que elijas.'))];
+}
+
+function route(){
+  const h=location.hash||'#/inicio',main=$('#main');main.innerHTML='';
+  const m=h.startsWith('#/m/')&&M.find(x=>x.id===h.slice(4));
+  main.append(...[].concat(m?lesson(m):h==='#/cards'?cards():h==='#/panel'?panel():h==='#/recursos'?recursos():home()));
+  drawNav($('#buscar').value);$('#side').classList.remove('open');window.scrollTo(0,0);
+}
+
+/* Eventos */
+addEventListener('hashchange',route);
+$('#buscar').addEventListener('input',e=>drawNav(e.target.value));
+$('#menuBtn').onclick=()=>$('#side').classList.toggle('open');
+$('#userBtn').onclick=()=>$('#login').showModal();
+$('#loginForm').addEventListener('submit',e=>{
+  if(e.submitter&&e.submitter.value==='ok'){S.user=$('#nombre').value.trim();save();drawNav();route()}
+});
+route();
+</script>
+</body>
+</html>
